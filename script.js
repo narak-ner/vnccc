@@ -3,10 +3,15 @@ let selectedSim = '-';
 const form = document.getElementById('storeForm');
 const STORAGE_KEY = 'store_form_auto_save_data';
 
-// กำหนดวันที่ปัจจุบันล่วงหน้าแบบไดนามิก
+// กำหนดวันที่ปัจจุบันอัตโนมัติ ไม่เกี่ยวกับระบบบันทึก/รีเซ็ต
+// ใช้วันที่ตามเวลาเครื่อง (ไม่ใช้ toISOString เพราะเป็น UTC ทำให้ช่วงเที่ยงคืน-06:59 ชี้วันเมื่อวาน)
 function setDefaultDate() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('inputDate').value = today;
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const dateInput = document.getElementById('inputDate');
+    if (dateInput.value !== today) {
+        dateInput.value = today;
+    }
 }
 
 // -------------------------------------------------------------
@@ -17,7 +22,7 @@ function saveData() {
     const elements = form.querySelectorAll('input, textarea, select');
     
     elements.forEach(el => {
-        if (el.name) {
+        if (el.name && el.name !== 'date') {
             formData[el.name] = el.value;
         }
     });
@@ -39,7 +44,7 @@ function loadData() {
         const elements = form.querySelectorAll('input, textarea, select');
 
         elements.forEach(el => {
-            if (el.name && formData[el.name] !== undefined) {
+            if (el.name && el.name !== 'date' && formData[el.name] !== undefined) {
                 el.value = formData[el.name];
             }
         });
@@ -56,22 +61,23 @@ function loadData() {
 }
 
 function resetAllData() {
-    // 1. ล้างค่าใน Input/Textarea ทั้งหมด
-    form.reset();
-    
+    // 1. ล้างค่า Input/Textarea ทั้งหมด ยกเว้นช่องวันที่ (วันที่เป็นอัตโนมัติ ไม่ผูกกับปุ่มรีเซ็ต)
+    form.querySelectorAll('input, textarea, select').forEach(el => {
+        if (el.id !== 'inputDate') {
+            el.value = '';
+        }
+    });
+
     // 2. คืนค่าการเลือกปุ่ม
     selectedCond = '-';
     selectedSim = '-';
     document.querySelectorAll('.btn-opt').forEach(btn => btn.classList.remove('active'));
-    
+
     // 3. ล้าง Textarea สรุปผล
     document.getElementById('output').value = '';
-    
+
     // 4. ลบข้อมูลจาก Storage
     localStorage.removeItem(STORAGE_KEY);
-
-    // 5. ตั้งค่าวันที่กลับเป็นวันนี้
-    setDefaultDate();
 }
 
 // -------------------------------------------------------------
@@ -220,6 +226,13 @@ ${getVal('social')}
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
     updateDownAuto();
+
+    // ให้วันที่เป็นวันนี้เสมอ และอัปเดตเองทันทีที่ขึ้นวันใหม่ (เปิดหน้าจอค้างไว้ก็อัปเดต)
+    setDefaultDate();
+    setInterval(setDefaultDate, 30 * 1000);
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) setDefaultDate();
+    });
 
     // คำนวณเงินดาวน์อัตโนมัติเมื่อพิมพ์ยอดที่ร้านจัดหรือเรท %
     form.elements['p_store_amt'].addEventListener('input', updateDownAuto);
