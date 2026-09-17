@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VNC</title>
+    <!-- เชื่อมต่อไฟล์ CSS ภายนอก -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="box">
+    <div class="header-top">
+        <h2>✅ VNC</h2>
+        <button type="button" id="btnResetTop" class="btn-reset-top">🧹 ล้างข้อมูล</button>
+    </div>
+    
+    <div class="sub-title">✨ รบกวนร้านค้ากรอกข้อมูลให้ครบถ้วนเพื่อความรวดเร็วในการตรวจสอบ ✨</div>
+
+    <form id="storeForm">
+        <div class="sec">
+            <label>🗓️ วันที่ :</label>
+            <input type="date" name="date" id="inputDate">
+        </div>
+
+        <div class="sec">
+            <div class="title">2️⃣ ข้อมูลลูกค้า</div>
+            <label>ชื่อ-สกุล :</label>
+            <input type="text" name="name" placeholder="ชื่อ - นามสกุล">
+            <label>ชื่อเล่น :</label>
+            <input type="text" name="nickname" placeholder="ชื่อเล่น">
+        </div>
+
+        <div class="sec">
+            <div class="title">3️⃣ ติดต่อลูกค้า</div>
+            <label>เบอร์โทรลูกค้า :</label>
+            <input type="text" name="phone" placeholder="08X-XXX-XXXX">
+            <label>ไอดี ไลน์ ลูกค้า :</label>
+            <input type="text" name="line" placeholder="Line ID">
+        </div>
+
+        <div class="sec">
+            <div class="title">4️⃣ ที่อยู่ปัจจุบันของลูกค้า</div>
+            <textarea name="addr" rows="2" placeholder="ที่อยู่ปัจจุบัน..."></textarea>
+        </div>
+
+        <div class="sec">
+            <div class="title">5️⃣ ที่ทำงานลูกค้า (แนบเอกสารหลักฐานการทำงานเลยนะคะ)</div>
+            <label>ชื่อบริษัท/ร้าน :</label>
+            <input type="text" name="work_name">
+            <label>ที่อยู่บริษัท :</label>
+            <input type="text" name="work_addr">
+            <label>เบอร์โทรติดต่อที่ทำงาน :</label>
+            <input type="text" name="work_phone">
+            <label>ตำแหน่ง / หน้าที่ :</label>
+            <input type="text" name="work_pos">
+            <label>เงินเดือน :</label>
+            <input type="text" name="salary">
+        </div>
+
+        <div class="sec">
+            <div class="title">6️⃣ บุคคลอ้างอิง (ต้องเป็นพ่อ /แม่ /ญาติ ❗️)</div>
+            <div class="sub-sec-title">อ้างอิง 1</div>
+            <label>ชื่อ - สกุล :</label>
+            <input type="text" name="r1_name">
+            <label>ชื่อเล่น :</label>
+            <input type="text" name="r1_nick">
+            <label>เบอร์โทร :</label>
+            <input type="text" name="r1_tel">
+            <label>อาชีพ :</label>
+            <input type="text" name="r1_job">
+            <label>ความสัมพันธ์ :</label>
+            <input type="text" name="r1_rel">
+
+            <div class="sub-sec-title mt-12">อ้างอิง 2</div>
+            <label>ชื่อ - สกุล :</label>
+            <input type="text" name="r2_name">
+            <label>ชื่อเล่น :</label>
+            <input type="text" name="r2_nick">
+            <label>เบอร์โทร :</label>
+            <input type="text" name="r2_tel">
+            <label>อาชีพ :</label>
+            <input type="text" name="r2_job">
+            <label>ความสัมพันธ์ :</label>
+            <input type="text" name="r2_rel">
+        </div>
+
+        <div class="sec">
+            <div class="title">7️⃣ คนค้ำประกัน (แนบบัตรประชาชนด้วยนะคะ ❗️)👇🏻</div>
+            <label>ชื่อ - สกุล :</label>
+            <input type="text" name="g_name">
+            <label>ชื่อเล่น :</label>
+            <input type="text" name="g_nick">
+            <label>เบอร์โทร :</label>
+            <input type="text" name="g_tel">
+            <label>อาชีพ :</label>
+            <input type="text" name="g_job">
+            <label>รายได้ :</label>
+            <input type="text" name="g_inc">
+            <label>ความสัมพันธ์ :</label>
+            <input type="text" name="g_rel">
+        </div>
+
+        <div class="sec">
+            <div class="title">8️⃣ แนบ Link Facebook / TikTok / IG</div>
+            <input type="text" name="social" placeholder="วางลิงก์โซเชียล...">
+        </div>
+
+        <div class="sec">
+            <div class="title">9️⃣ รายละเอียดสินค้าที่ผ่อน ระบุทั้งหมดให้ชัดเจน</div>
+            <label>รุ่น & ความจุ :</label>
+            <input type="text" name="p_model" placeholder="เช่น Reno16 Pro 512GB">
+
+            <label>สีเครื่อง :</label>
+            <input type="text" name="p_color" placeholder="สีเครื่อง">
+            
+            <label>มือ 1&2 (โปรดระบุ) :</label>
+            <div class="btn-group-opt">
+                <button type="button" class="btn-opt btn-cond" id="btn_m1">มือ 1</button>
+                <button type="button" class="btn-opt btn-cond" id="btn_m2">มือ 2</button>
+            </div>
+
+            <label>เงินดาวน์ (ยอดที่ร้านจัด x เรท %) :</label>
+            <input type="text" name="p_down" id="p_down" placeholder="คำนวณอัตโนมัติ..." readonly>
+
+            <label>เรทผ่อน/เดือน * จำนวนงวด :</label>
+            <div class="grid-2">
+                <input type="text" name="p_rate" placeholder="เรทผ่อน/เดือน">
+                <input type="text" name="p_period" placeholder="จำนวนงวด">
+            </div>
+
+            <label>ยอดที่ร้านจัด & เรท % :</label>
+            <div class="grid-2">
+                <input type="text" name="p_store_amt" placeholder="ยอดที่ร้านจัด">
+                <input type="text" name="p_store_rate" placeholder="เรท %">
+            </div>
+
+            <label>ลูกค้าใช้ซิมอะไร :</label>
+            <div class="btn-group-opt">
+                <button type="button" class="btn-opt" id="btn_ais">AIS</button>
+                <button type="button" class="btn-opt" id="btn_true">True</button>
+                <button type="button" class="btn-opt" id="btn_dtac">dtac</button>
+            </div>
+        </div>
+
+        <div class="btns">
+            <button type="button" class="action-btn btn-sum" id="btnBuildText">📌 สรุปข้อมูล</button>
+        </div>
+    </form>
+
+    <h3 class="output-title">📄 สรุปข้อมูลทั้งหมด:</h3>
+    <textarea id="output" readonly placeholder="กดปุ่ม 'สรุปข้อมูล' เพื่อแสดงข้อความที่นี่..."></textarea>
+</div>
+
+<!-- เชื่อมต่อไฟล์ JavaScript ภายนอก -->
+<script src="script.js"></script>
+</body>
+</html>
