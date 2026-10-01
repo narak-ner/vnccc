@@ -1,158 +1,516 @@
 <!doctype html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VNC</title>
-    <!-- เชื่อมต่อไฟล์ CSS ภายนอก -->
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VNC</title>
+<style>
+  * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+
+  body {
+    background: #f4f5f7; margin: 0; padding: 12px;
+    color: #333; min-height: 100vh;
+  }
+
+  /* ===== Layout ===== */
+  .box {
+    width: 100%; max-width: 640px; margin: 0 auto;
+    background: #fff; padding: clamp(14px, 4vw, 22px);
+    border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  }
+
+  .header-top {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; flex-wrap: wrap; margin-bottom: 8px;
+  }
+
+  h2 {
+    flex-grow: 1; margin: 0; text-align: center;
+    color: #06c; font-size: clamp(17px, 4.5vw, 20px);
+  }
+
+  .sub-title {
+    text-align: center; color: #666; line-height: 1.5;
+    font-size: clamp(11px, 3vw, 12px); margin-bottom: 15px;
+  }
+
+  /* ===== Sections ===== */
+  .sec {
+    background: #f9f9f9; border-left: 4px solid #06c;
+    padding: clamp(10px, 3vw, 12px); margin-bottom: 12px; border-radius: 4px;
+  }
+
+  .title, .sub-sec-title { font-weight: 700; color: #222; }
+  .title { font-size: clamp(13px, 3.5vw, 14px); margin-bottom: 8px; }
+  .sub-sec-title { font-size: clamp(12px, 3.3vw, 13px); margin-top: 5px; }
+  .mt-12 { margin-top: 12px; }
+
+  /* ===== Inputs ===== */
+  label {
+    display: block; color: #555; font-size: clamp(11px, 3vw, 12px);
+    margin: 6px 0 2px;
+  }
+
+  input, textarea, select {
+    width: 100%; padding: clamp(8px, 2.5vw, 10px);
+    border: 1px solid #ccc; border-radius: 6px;
+    font-size: clamp(13px, 3.6vw, 14px); background: #fff; outline: none;
+    transition: .2s;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: #06c; box-shadow: 0 0 0 2px rgba(0,102,204,.15);
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* ===== Buttons ===== */
+  .btn-group-opt { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+
+  .btn-opt {
+    flex: 1 1 80px; padding: clamp(8px, 2.5vw, 10px);
+    border: 1px solid #ccc; background: #e0e0e0; color: #666;
+    border-radius: 6px; font-size: clamp(13px, 3.5vw, 14px);
+    font-weight: 700; cursor: pointer; text-align: center;
+    white-space: nowrap; transition: all .2s ease;
+  }
+
+  .btn-opt.active {
+    color: #fff !important; transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+
+  .btn-cond.active { background: #06c !important; border-color: #0052a3 !important; }
+  #btn_ais.active  { background: #70b200 !important; border-color: #5a8f00 !important; }
+  #btn_true.active { background: #ed1c24 !important; border-color: #c41219 !important; }
+  #btn_dtac.active { background: #00a3e0 !important; border-color: #0082b3 !important; }
+
+  .btn-reset-top {
+    background: #ff4d4f; color: #fff; border: none;
+    padding: 6px 12px; border-radius: 6px;
+    font-size: clamp(11px, 3vw, 12px); font-weight: 700;
+    cursor: pointer; white-space: nowrap; transition: background .2s;
+  }
+  .btn-reset-top:hover { background: #d9363e; }
+
+  .btns { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+
+  .action-btn {
+    flex: 1 1 140px; padding: clamp(10px, 3vw, 12px);
+    border: none; border-radius: 6px; color: #fff;
+    font-size: clamp(13px, 3.6vw, 15px); font-weight: 700;
+    cursor: pointer; white-space: nowrap; transition: .2s;
+  }
+
+  .btn-sum  { background: #06c; }
+  .btn-sum:hover  { background: #0052a3; }
+  .btn-copy { background: #28a745; }
+  .btn-copy:hover { background: #218838; }
+
+  /* ===== Output ===== */
+  .output-title {
+    margin-top: 20px; margin-bottom: 5px;
+    font-size: clamp(13px, 3.6vw, 15px); color: #333;
+  }
+
+  #output {
+    width: 100%; height: clamp(220px, 45vh, 320px);
+    margin-top: 8px; padding: 10px;
+    border: 1px solid #ddd; border-radius: 6px;
+    background: #fafafa; resize: vertical;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: clamp(12px, 3.3vw, 13px);
+    line-height: 1.55; white-space: pre-wrap;
+  }
+
+  #copyStatus {
+    text-align: center; font-size: 13px; font-weight: 600;
+    margin-top: 8px; min-height: 18px;
+  }
+
+  /* ===== Mobile small ===== */
+  @media (max-width: 360px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .btn-opt, .action-btn { flex: 1 1 100%; }
+    .btn-reset-top { width: 100%; text-align: center; }
+    .header-top { flex-direction: column; align-items: stretch; }
+  }
+</style>
 </head>
 <body>
 
 <div class="box">
-    <div class="header-top">
-        <h2>✅ VNC</h2>
-        <button type="button" id="btnResetTop" class="btn-reset-top">🧹 ล้างข้อมูล</button>
+  <div class="header-top">
+    <h2>✅ VNC</h2>
+    <button type="button" id="btnResetTop" class="btn-reset-top">🧹 ล้างข้อมูล</button>
+  </div>
+
+  <div class="sub-title">✨ รบกวนร้านค้ากรอกข้อมูลให้ครบถ้วนเพื่อความรวดเร็วในการตรวจสอบ ✨</div>
+
+  <form id="storeForm">
+    <div class="sec">
+      <label>🗓️ วันที่ :</label>
+      <input type="date" name="date" id="inputDate" readonly>
     </div>
-    
-    <div class="sub-title">✨ รบกวนร้านค้ากรอกข้อมูลให้ครบถ้วนเพื่อความรวดเร็วในการตรวจสอบ ✨</div>
 
-    <form id="storeForm">
-        <div class="sec">
-            <label>🗓️ วันที่ :</label>
-            <input type="date" name="date" id="inputDate" readonly>
-        </div>
+    <div class="sec">
+      <div class="title">2️⃣ ข้อมูลลูกค้า</div>
+      <label>ชื่อ-สกุล :</label>
+      <input type="text" name="name" placeholder="ชื่อ - นามสกุล">
+      <label>ชื่อเล่น :</label>
+      <input type="text" name="nickname" placeholder="ชื่อเล่น">
+    </div>
 
-        <div class="sec">
-            <div class="title">2️⃣ ข้อมูลลูกค้า</div>
-            <label>ชื่อ-สกุล :</label>
-            <input type="text" name="name" placeholder="ชื่อ - นามสกุล">
-            <label>ชื่อเล่น :</label>
-            <input type="text" name="nickname" placeholder="ชื่อเล่น">
-        </div>
+    <div class="sec">
+      <div class="title">3️⃣ ติดต่อลูกค้า</div>
+      <label>เบอร์โทรลูกค้า :</label>
+      <input type="text" name="phone" placeholder="08X-XXX-XXXX">
+      <label>ไอดี ไลน์ ลูกค้า :</label>
+      <input type="text" name="line" placeholder="Line ID">
+    </div>
 
-        <div class="sec">
-            <div class="title">3️⃣ ติดต่อลูกค้า</div>
-            <label>เบอร์โทรลูกค้า :</label>
-            <input type="text" name="phone" placeholder="08X-XXX-XXXX">
-            <label>ไอดี ไลน์ ลูกค้า :</label>
-            <input type="text" name="line" placeholder="Line ID">
-        </div>
+    <div class="sec">
+      <div class="title">4️⃣ ที่อยู่ปัจจุบันของลูกค้า</div>
+      <textarea name="addr" rows="2" placeholder="ที่อยู่ปัจจุบัน..."></textarea>
+    </div>
 
-        <div class="sec">
-            <div class="title">4️⃣ ที่อยู่ปัจจุบันของลูกค้า</div>
-            <textarea name="addr" rows="2" placeholder="ที่อยู่ปัจจุบัน..."></textarea>
-        </div>
+    <div class="sec">
+      <div class="title">5️⃣ ที่ทำงานลูกค้า (แนบเอกสารหลักฐานการทำงานเลยนะคะ)</div>
+      <label>ชื่อบริษัท/ร้าน :</label>
+      <input type="text" name="work_name">
+      <label>ที่อยู่บริษัท :</label>
+      <input type="text" name="work_addr">
+      <label>เบอร์โทรติดต่อที่ทำงาน :</label>
+      <input type="text" name="work_phone">
+      <label>ตำแหน่ง / หน้าที่ :</label>
+      <input type="text" name="work_pos">
+      <label>เงินเดือน :</label>
+      <input type="text" name="salary">
+    </div>
 
-        <div class="sec">
-            <div class="title">5️⃣ ที่ทำงานลูกค้า (แนบเอกสารหลักฐานการทำงานเลยนะคะ)</div>
-            <label>ชื่อบริษัท/ร้าน :</label>
-            <input type="text" name="work_name">
-            <label>ที่อยู่บริษัท :</label>
-            <input type="text" name="work_addr">
-            <label>เบอร์โทรติดต่อที่ทำงาน :</label>
-            <input type="text" name="work_phone">
-            <label>ตำแหน่ง / หน้าที่ :</label>
-            <input type="text" name="work_pos">
-            <label>เงินเดือน :</label>
-            <input type="text" name="salary">
-        </div>
+    <div class="sec">
+      <div class="title">6️⃣ บุคคลอ้างอิง (ต้องเป็นพ่อ /แม่ /ญาติ ❗️)</div>
+      <div class="sub-sec-title">อ้างอิง 1</div>
+      <label>ชื่อ - สกุล :</label>
+      <input type="text" name="r1_name">
+      <label>ชื่อเล่น :</label>
+      <input type="text" name="r1_nick">
+      <label>เบอร์โทร :</label>
+      <input type="text" name="r1_tel">
+      <label>อาชีพ :</label>
+      <input type="text" name="r1_job">
+      <label>ความสัมพันธ์ :</label>
+      <input type="text" name="r1_rel">
 
-        <div class="sec">
-            <div class="title">6️⃣ บุคคลอ้างอิง (ต้องเป็นพ่อ /แม่ /ญาติ ❗️)</div>
-            <div class="sub-sec-title">อ้างอิง 1</div>
-            <label>ชื่อ - สกุล :</label>
-            <input type="text" name="r1_name">
-            <label>ชื่อเล่น :</label>
-            <input type="text" name="r1_nick">
-            <label>เบอร์โทร :</label>
-            <input type="text" name="r1_tel">
-            <label>อาชีพ :</label>
-            <input type="text" name="r1_job">
-            <label>ความสัมพันธ์ :</label>
-            <input type="text" name="r1_rel">
+      <div class="sub-sec-title mt-12">อ้างอิง 2</div>
+      <label>ชื่อ - สกุล :</label>
+      <input type="text" name="r2_name">
+      <label>ชื่อเล่น :</label>
+      <input type="text" name="r2_nick">
+      <label>เบอร์โทร :</label>
+      <input type="text" name="r2_tel">
+      <label>อาชีพ :</label>
+      <input type="text" name="r2_job">
+      <label>ความสัมพันธ์ :</label>
+      <input type="text" name="r2_rel">
+    </div>
 
-            <div class="sub-sec-title mt-12">อ้างอิง 2</div>
-            <label>ชื่อ - สกุล :</label>
-            <input type="text" name="r2_name">
-            <label>ชื่อเล่น :</label>
-            <input type="text" name="r2_nick">
-            <label>เบอร์โทร :</label>
-            <input type="text" name="r2_tel">
-            <label>อาชีพ :</label>
-            <input type="text" name="r2_job">
-            <label>ความสัมพันธ์ :</label>
-            <input type="text" name="r2_rel">
-        </div>
+    <div class="sec">
+      <div class="title">7️⃣ คนค้ำประกัน (แนบบัตรประชาชนด้วยนะคะ ❗️)👇🏻</div>
+      <label>ชื่อ - สกุล :</label>
+      <input type="text" name="g_name">
+      <label>ชื่อเล่น :</label>
+      <input type="text" name="g_nick">
+      <label>เบอร์โทร :</label>
+      <input type="text" name="g_tel">
+      <label>อาชีพ :</label>
+      <input type="text" name="g_job">
+      <label>รายได้ :</label>
+      <input type="text" name="g_inc">
+      <label>ความสัมพันธ์ :</label>
+      <input type="text" name="g_rel">
+    </div>
 
-        <div class="sec">
-            <div class="title">7️⃣ คนค้ำประกัน (แนบบัตรประชาชนด้วยนะคะ ❗️)👇🏻</div>
-            <label>ชื่อ - สกุล :</label>
-            <input type="text" name="g_name">
-            <label>ชื่อเล่น :</label>
-            <input type="text" name="g_nick">
-            <label>เบอร์โทร :</label>
-            <input type="text" name="g_tel">
-            <label>อาชีพ :</label>
-            <input type="text" name="g_job">
-            <label>รายได้ :</label>
-            <input type="text" name="g_inc">
-            <label>ความสัมพันธ์ :</label>
-            <input type="text" name="g_rel">
-        </div>
+    <div class="sec">
+      <div class="title">8️⃣ แนบ Link Facebook / TikTok / IG</div>
+      <input type="text" name="social" placeholder="วางลิงก์โซเชียล...">
+    </div>
 
-        <div class="sec">
-            <div class="title">8️⃣ แนบ Link Facebook / TikTok / IG</div>
-            <input type="text" name="social" placeholder="วางลิงก์โซเชียล...">
-        </div>
+    <div class="sec">
+      <div class="title">9️⃣ รายละเอียดสินค้าที่ผ่อน ระบุทั้งหมดให้ชัดเจน</div>
+      <label>รุ่น & ความจุ :</label>
+      <input type="text" name="p_model" placeholder="เช่น Reno16 Pro 512GB">
+      <label>สีเครื่อง :</label>
+      <input type="text" name="p_color" placeholder="สีเครื่อง">
 
-        <div class="sec">
-            <div class="title">9️⃣ รายละเอียดสินค้าที่ผ่อน ระบุทั้งหมดให้ชัดเจน</div>
-            <label>รุ่น & ความจุ :</label>
-            <input type="text" name="p_model" placeholder="เช่น Reno16 Pro 512GB">
+      <label>มือ 1&2 (โปรดระบุ) :</label>
+      <div class="btn-group-opt">
+        <button type="button" class="btn-opt btn-cond" id="btn_m1">มือ 1</button>
+        <button type="button" class="btn-opt btn-cond" id="btn_m2">มือ 2</button>
+      </div>
 
-            <label>สีเครื่อง :</label>
-            <input type="text" name="p_color" placeholder="สีเครื่อง">
-            
-            <label>มือ 1&2 (โปรดระบุ) :</label>
-            <div class="btn-group-opt">
-                <button type="button" class="btn-opt btn-cond" id="btn_m1">มือ 1</button>
-                <button type="button" class="btn-opt btn-cond" id="btn_m2">มือ 2</button>
-            </div>
+      <label>เงินดาวน์ (ยอดที่ร้านจัด x เรท %) :</label>
+      <input type="text" name="p_down" id="p_down" placeholder="คำนวณอัตโนมัติ..." readonly>
 
-            <label>เงินดาวน์ (ยอดที่ร้านจัด x เรท %) :</label>
-            <input type="text" name="p_down" id="p_down" placeholder="คำนวณอัตโนมัติ..." readonly>
+      <label>เรทผ่อน/เดือน * จำนวนงวด :</label>
+      <div class="grid-2">
+        <input type="text" name="p_rate" placeholder="เรทผ่อน/เดือน">
+        <input type="text" name="p_period" placeholder="จำนวนงวด">
+      </div>
 
-            <label>เรทผ่อน/เดือน * จำนวนงวด :</label>
-            <div class="grid-2">
-                <input type="text" name="p_rate" placeholder="เรทผ่อน/เดือน">
-                <input type="text" name="p_period" placeholder="จำนวนงวด">
-            </div>
+      <label>ยอดที่ร้านจัด & เรท % :</label>
+      <div class="grid-2">
+        <input type="text" name="p_store_amt" placeholder="ยอดที่ร้านจัด">
+        <input type="text" name="p_store_rate" placeholder="เรท %">
+      </div>
 
-            <label>ยอดที่ร้านจัด & เรท % :</label>
-            <div class="grid-2">
-                <input type="text" name="p_store_amt" placeholder="ยอดที่ร้านจัด">
-                <input type="text" name="p_store_rate" placeholder="เรท %">
-            </div>
+      <label>ลูกค้าใช้ซิมอะไร :</label>
+      <div class="btn-group-opt">
+        <button type="button" class="btn-opt" id="btn_ais">AIS</button>
+        <button type="button" class="btn-opt" id="btn_true">True</button>
+        <button type="button" class="btn-opt" id="btn_dtac">dtac</button>
+      </div>
+    </div>
 
-            <label>ลูกค้าใช้ซิมอะไร :</label>
-            <div class="btn-group-opt">
-                <button type="button" class="btn-opt" id="btn_ais">AIS</button>
-                <button type="button" class="btn-opt" id="btn_true">True</button>
-                <button type="button" class="btn-opt" id="btn_dtac">dtac</button>
-            </div>
-        </div>
+    <div class="btns">
+      <button type="button" class="action-btn btn-sum" id="btnBuildText">📌 สรุปข้อมูล</button>
+      <button type="button" class="action-btn btn-copy" id="btnCopy">📋 คัดลอก</button>
+    </div>
+  </form>
 
-        <div class="btns">
-            <button type="button" class="action-btn btn-sum" id="btnBuildText">📌 สรุปข้อมูล</button>
-        </div>
-    </form>
-
-    <h3 class="output-title">📄 สรุปข้อมูลทั้งหมด:</h3>
-    <textarea id="output" readonly placeholder="กดปุ่ม 'สรุปข้อมูล' เพื่อแสดงข้อความที่นี่..."></textarea>
+  <h3 class="output-title">📄 ตัวอย่างผลลัพธ์ (อัปเดตอัตโนมัติ):</h3>
+  <textarea id="output" readonly placeholder="กรอกข้อมูลด้านบน ระบบจะแสดงผลลัพธ์ที่นี่อัตโนมัติ..."></textarea>
+  <div id="copyStatus"></div>
 </div>
 
-<!-- เชื่อมต่อไฟล์ JavaScript ภายนอก -->
-<script src="script.js"></script>
+<script>
+(() => {
+  const form = document.getElementById('storeForm');
+  const output = document.getElementById('output');
+  const statusEl = document.getElementById('copyStatus');
+  const STORAGE_KEY = 'store_form_auto_save_data';
+
+  let selectedCond = '-';
+  let selectedSim = '-';
+
+  const $ = id => document.getElementById(id);
+  const getVal = name => (form.elements[name]?.value.trim()) || '-';
+  const num = v => { const n = parseFloat(String(v).replace(/[^0-9.]/g, '')); return isNaN(n) ? null : n; };
+
+  // ===== วันที่ =====
+  function setToday() {
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if ($('inputDate').value !== today) $('inputDate').value = today;
+  }
+
+  const formatDate = v => {
+    if (!v || v === '-') return '-';
+    const [y, m, d] = v.split('-');
+    return `${+d}/${+m}/${+y + 543}`;
+  };
+
+  // ===== LocalStorage =====
+  function save() {
+    const data = {};
+    form.querySelectorAll('input, textarea, select').forEach(el => {
+      if (el.name && el.name !== 'date') data[el.name] = el.value;
+    });
+    data.selectedCond = selectedCond;
+    data.selectedSim = selectedSim;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function load() {
+    setToday();
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      form.querySelectorAll('input, textarea, select').forEach(el => {
+        if (el.name && el.name !== 'date' && data[el.name] !== undefined) el.value = data[el.name];
+      });
+      if (data.selectedCond) selectCond(data.selectedCond, false);
+      if (data.selectedSim)  selectSim(data.selectedSim, false);
+    } catch (e) { console.error(e); }
+  }
+
+  function reset() {
+    form.querySelectorAll('input, textarea, select').forEach(el => {
+      if (el.id !== 'inputDate') el.value = '';
+    });
+    selectedCond = selectedSim = '-';
+    document.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('active'));
+    output.value = '';
+    localStorage.removeItem(STORAGE_KEY);
+    updatePreview();
+  }
+
+  // ===== ปุ่มเลือก =====
+  function selectCond(val, save_ = true) {
+    selectedCond = selectedCond === val ? '-' : val;
+    $('btn_m1').classList.toggle('active', selectedCond === 'มือ 1');
+    $('btn_m2').classList.toggle('active', selectedCond === 'มือ 2');
+    if (save_) { save(); updatePreview(); }
+  }
+
+  function selectSim(val, save_ = true) {
+    selectedSim = selectedSim === val ? '-' : val;
+    $('btn_ais').classList.toggle('active',  selectedSim === 'AIS');
+    $('btn_true').classList.toggle('active', selectedSim === 'True');
+    $('btn_dtac').classList.toggle('active', selectedSim === 'dtac');
+    if (save_) { save(); updatePreview(); }
+  }
+
+  // ===== เงินดาวน์อัตโนมัติ =====
+  function updateDown() {
+    const amt = num(form.elements.p_store_amt.value);
+    const rate = num(form.elements.p_store_rate.value);
+    form.elements.p_down.value = (amt !== null && rate !== null)
+      ? (amt * rate / 100).toLocaleString('th-TH', { maximumFractionDigits: 2 })
+      : '';
+  }
+
+  // ===== สร้างข้อความ =====
+  function buildText() {
+    const rate = getVal('p_rate'), period = getVal('p_period');
+    const installment = (rate !== '-' || period !== '-') ? `${rate} * ${period}` : '-';
+
+    const sAmt = getVal('p_store_amt'), sRate = getVal('p_store_rate');
+    const storeFull = (sAmt !== '-' || sRate !== '-')
+      ? `${sAmt} & ${sRate}${sRate.includes('%') ? '' : '%'}` : '-';
+
+    return `✅แบบฟอร์มการกรอกข้อมูลร้านค้า
+( ✨รบกวนร้านค้ากรอกข้อมูลให้ครบถ้วนเพื่อความรวดเร็วในการตรวจสอบ ✨)
+
+1️⃣ แนบรูปบัตรประชาชนลูกค้า & รูปลูกค้าถ่ายคู่บัตร ‼️
+
+🗓️วันที่ : ${formatDate(getVal('date'))}
+2️⃣ ชื่อ-สกุล : ${getVal('name')}
+ชื่อเล่น : ${getVal('nickname')}
+
+3️⃣ เบอร์โทรลูกค้า : ${getVal('phone')}
+ไอดี ไลน์ ลูกค้า : ${getVal('line')}
+
+4️⃣ ที่อยู่ ปัจจุบันของลูกค้า : ${getVal('addr')}
+
+5️⃣ ที่ทำงานลูกค้า ดังนี้ (แนบเอกสารหลักฐานการทำงานเลยนะคะ)👇🏻
+ชื่อบริษัท/ร้าน : ${getVal('work_name')}
+ที่อยู่บริษัท : ${getVal('work_addr')}
+เบอร์โทรติดต่อที่ทำงาน : ${getVal('work_phone')}
+ตำแหน่ง / หน้าที่ : ${getVal('work_pos')}
+เงินเดือน : ${getVal('salary')}
+
+6️⃣ บุคคลอ้างอิง (ต้องเป็นพ่อ /แม่ /ญาติ ❗️)👇🏻
+อ้างอิง 1 ชื่อ - สกุล : ${getVal('r1_name')}
+ชื่อเล่น : ${getVal('r1_nick')}
+เบอร์โทร : ${getVal('r1_tel')}
+อาชีพ : ${getVal('r1_job')}
+ความสัมพันธ์ : ${getVal('r1_rel')}
+
+อ้างอิง 2 ชื่อ - สกุล : ${getVal('r2_name')}
+ชื่อเล่น : ${getVal('r2_nick')}
+เบอร์โทร : ${getVal('r2_tel')}
+อาชีพ : ${getVal('r2_job')}
+ความสัมพันธ์ : ${getVal('r2_rel')}
+
+7️⃣ คนค้ำประกัน (แนบบัตรประชาชนด้วยนะคะ ❗️)👇🏻
+ชื่อ - สกุล : ${getVal('g_name')}
+ชื่อเล่น : ${getVal('g_nick')}
+เบอร์โทร : ${getVal('g_tel')}
+อาชีพ : ${getVal('g_job')}
+รายได้ : ${getVal('g_inc')}
+ความสัมพันธ์ : ${getVal('g_rel')}
+
+8️⃣ แนบ Link Facebook / TikTok / IG 👇🏻
+${getVal('social')}
+
+9️⃣ รายละเอียดสินค้าที่ผ่อน ระบุทั้งหมดให้ชัดเจน⤵️
+รุ่น & ความจุ : ${getVal('p_model')}
+สีเครื่อง : ${getVal('p_color')}
+มือ 1&2 (โปรดระบุ) : ${selectedCond}
+เงินดาวน์ : ${getVal('p_down')}
+เรทผ่อน/เดือน * จำนวนงวด : ${installment}
+ยอดที่ร้านจัด & เรท % : ${storeFull}
+ลูกค้าใช้ซิมอะไร : ${selectedSim}
+
+📲ข้อมูลที่สามารถส่งตามหลังได้ เมื่อผ่านการอนุมัติแล้ว ✅
+1️⃣ รูปลูกค้าถือเครื่อง+บัตรปชช และ เลขหลังบัตรประชาชน
+2️⃣รูปเครื่องลูกค้า(ด้านหลัง)
+3️⃣รูปหน้าเลขอีมี่
+4️⃣รูปหน้าเลขเครื่อง`;
+  }
+
+  function updatePreview() {
+    output.value = buildText();
+  }
+
+  // ===== คัดลอก =====
+  function showStatus(msg, color) {
+    statusEl.style.color = color;
+    statusEl.textContent = msg;
+    setTimeout(() => statusEl.textContent = '', 2000);
+  }
+
+  async function copyOutput() {
+    const text = buildText();
+    output.value = text;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        output.removeAttribute('readonly');
+        output.select();
+        output.setSelectionRange(0, 99999);
+        document.execCommand('copy');
+        output.setAttribute('readonly', true);
+      }
+      showStatus('✅ คัดลอกข้อความเรียบร้อยแล้ว', '#28a745');
+    } catch {
+      showStatus('❌ คัดลอกไม่สำเร็จ', '#dc3545');
+    }
+  }
+
+  // ===== Events =====
+  function bind() {
+    // ปุ่ม
+    $('btnResetTop').onclick  = reset;
+    $('btnBuildText').onclick = () => {
+      buildText();
+      output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    $('btnCopy').onclick = copyOutput;
+
+    $('btn_m1').onclick   = () => selectCond('มือ 1');
+    $('btn_m2').onclick   = () => selectCond('มือ 2');
+    $('btn_ais').onclick  = () => selectSim('AIS');
+    $('btn_true').onclick = () => selectSim('True');
+    $('btn_dtac').onclick = () => selectSim('dtac');
+
+    // เงินดาวน์
+    form.elements.p_store_amt.addEventListener('input', () => { updateDown(); updatePreview(); });
+    form.elements.p_store_rate.addEventListener('input', () => { updateDown(); updatePreview(); });
+
+    // auto-save + preview
+    form.addEventListener('input',  () => { save(); updatePreview(); });
+    form.addEventListener('change', () => { save(); updatePreview(); });
+  }
+
+  // ===== Init =====
+  function init() {
+    bind();
+    load();
+    updateDown();
+    updatePreview();
+    setToday();
+    setInterval(setToday, 30000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) setToday();
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
 </body>
 </html>
